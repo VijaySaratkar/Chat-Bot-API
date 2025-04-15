@@ -1,4 +1,4 @@
-# 🤖 ChatBot API – Node.js + OpenAI + JWT Auth
+# 🤖 ChatBot API – Node.js + OpenAI + JWT Auth + Node -v 20.x
 
 An intelligent chatbot API using **OpenAI**'s GPT model, built with **Node.js**, **Express**, and **MongoDB**. Includes full **Sign Up / Login** authentication with JWT. Easily deployable on **Vercel**.
 
