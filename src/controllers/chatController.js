@@ -6,21 +6,25 @@ export const sendMessage = async (req, res) => {
   const userId = req.user.id;
 
   try {
-    const openaiRes = await axios.post(
-      'https://api.openai.com/v1/chat/completions',
+    // ✅ Use the correct v1 API and a valid model name
+    const geminiRes = await axios.post(
+      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
-        model: "gpt-4.1", // or "gpt-3.5-turbo"
-        messages: [{ role: "user", content: message }]
+        contents: [
+          {
+            role: 'user',
+            parts: [{ text: message }]
+          }
+        ]
       },
       {
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
+          'Content-Type': 'application/json'
         }
       }
     );
 
-    const reply = openaiRes.data.choices[0].message.content;
+    const reply = geminiRes.data.candidates?.[0]?.content?.parts?.[0]?.text || "No response from Gemini.";
 
     const chat = await Chat.create({
       userId,
@@ -31,9 +35,10 @@ export const sendMessage = async (req, res) => {
     });
 
     res.json({ reply, chatId: chat._id });
+
   } catch (err) {
     console.error(err.response?.data || err.message);
-    res.status(500).json({ error: 'Chat failed' });
+    res.status(500).json({ error: err.response?.data?.error?.message || 'Gemini Chat failed' });
   }
 };
 
